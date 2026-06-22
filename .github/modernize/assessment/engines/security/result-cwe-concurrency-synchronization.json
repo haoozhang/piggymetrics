@@ -1,0 +1,96 @@
+{
+  "input_name": "CWE - Concurrency & Synchronization",
+  "analysis_method": "LLM",
+  "status": "success",
+  "result": {
+    "finding": "Assessed 6 CWE rules in Concurrency & Synchronization: 2 FOUND, 4 NOT_FOUND",
+    "confidence": "high",
+    "evidence": ["Scanned application source files for concurrency & synchronization patterns"],
+    "values": [
+      {
+        "id": "CWE-543",
+        "name": "Use of Singleton Pattern Without Synchronization in a Multithreaded Context",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 5,
+        "description": "The product uses the singleton pattern when creating a resource within a multithreaded environment.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      },
+      {
+        "id": "CWE-567",
+        "name": "Unsynchronized Access to Shared Data in a Multithreaded Context",
+        "status": "FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 5,
+        "description": "The product does not properly synchronize shared data, such as static variables across threads, which can lead to undefined behavior and unpredictable data changes.",
+        "evidence": {
+          "files": [
+            "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+          ],
+          "explanation": "ExchangeRatesServiceImpl is a Spring @Service singleton with a non-volatile, non-synchronized instance field 'container' (line 23). The getCurrentRates() method performs an unsynchronized check-then-act sequence (lines 34-37): it reads container, checks if null or stale, then updates it — all without synchronization. In a multithreaded environment with concurrent HTTP requests, multiple threads can simultaneously observe container as null, trigger redundant API calls, or read a partially updated container reference, leading to race conditions and unpredictable data."
+        }
+      },
+      {
+        "id": "CWE-662",
+        "name": "Improper Synchronization",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product utilizes multiple threads or processes to allow temporary access to a shared resource that can only be exclusive to one process at a time, but it does not properly synchronize these actions, which might cause simultaneous accesses of this resource by multiple threads or processes.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      },
+      {
+        "id": "CWE-667",
+        "name": "Improper Locking",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product does not properly acquire or release a lock on a resource, leading to unexpected resource state changes and behaviors.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      },
+      {
+        "id": "CWE-820",
+        "name": "Missing Synchronization",
+        "status": "FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product utilizes a shared resource in a concurrent manner but does not attempt to synchronize access to the resource.",
+        "evidence": {
+          "files": [
+            "statistics-service/src/main/java/com/piggymetrics/statistics/service/ExchangeRatesServiceImpl.java"
+          ],
+          "explanation": "The 'container' field in ExchangeRatesServiceImpl (line 23) is a shared mutable instance variable of a singleton Spring service, accessed and mutated in getCurrentRates() (lines 34-37) without any synchronization mechanism (no synchronized block, volatile keyword, or atomic reference). This constitutes missing synchronization on a shared resource that is read and written by multiple concurrent threads handling incoming HTTP requests."
+        }
+      },
+      {
+        "id": "CWE-821",
+        "name": "Incorrect Synchronization",
+        "status": "NOT_FOUND",
+        "category": "Concurrency & Synchronization",
+        "severity": "potential",
+        "storyPoint": 8,
+        "description": "The product utilizes a shared resource in a concurrent manner, but it does not correctly synchronize access to the resource.",
+        "evidence": {
+          "files": [],
+          "explanation": ""
+        }
+      }
+    ]
+  },
+  "execution_time_seconds": 0,
+  "timestamp": ""
+}
